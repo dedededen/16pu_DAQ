@@ -9,6 +9,7 @@ import os
 
 import matplotlib.pyplot as plt
 from analysis import decode_wave
+from analysis import decode_process
 
 size = [800,600]
 geometry_size = str(size[0]) +"x"+str(size[1])
@@ -79,10 +80,13 @@ class Application(Tkinter.Frame):
         if not file_index: return
         elif os.path.isdir(file_name):
             self.reflesh(path=file_name)
-        elif '.dat' in file_name:
+        elif 'wave' in file_name:
             self.memo(file_name)
             self.plot(file_name)
-
+        elif 'process' in file_name:
+            self.memo(file_name)
+            decode_process.read_process_file(file_name)
+            
     def plot(self,file_name):
         vol = decode_wave.read_wave_file(file_name)
         num = len(vol[0])
