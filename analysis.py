@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from analysis import decode_wave
 from analysis import decode_process
 
-size = [800,600]
+size = [800,700]
 geometry_size = str(size[0]) +"x"+str(size[1])
 data_path = './data'
 
@@ -25,44 +25,32 @@ class Application(Tkinter.Frame):
         self.create_frame()
         self.create_widgets()
         self.create_quit()
-        self.create_checkbox()
         self.create_memobox()
 
     def create_frame(self):
         self.lFrame = Tkinter.Frame(self.master)
-        self.lFrame.place(relx=0, rely=0,relwidth=0.5,relheight=0.7)
-
-        self.bFrame = Tkinter.Frame(self.master)
-        self.bFrame.place(relx=0.5, rely=0, relwidth=0.5, relheight=0.7)
+        self.lFrame.place(relx=0, rely=0,relwidth=0.5,relheight=1)
 
         self.mFrame = Tkinter.Frame(self.master)
-        self.mFrame.place(relx=0, rely=0.7, relwidth=1, relheight=0.3)
+        self.mFrame.place(relx=0.5, rely=0, relwidth=0.5, relheight=1)
         
     def create_widgets(self):
-        self.select = Tkinter.Button(self.bFrame, text="select/plot", command=self.select)
-        self.select.place(relx=0.5, rely=0.75)
+        self.select = Tkinter.Button(self.lFrame, text="select", command=self.select)
+        self.select.place(relx=0.7, rely=0.925)
         
         self.file_list = Tkinter.Listbox(self.lFrame ,selectmode='browse')
         self.reflesh()
-        self.file_list.place(relx=0.05, rely=0.1,relheight=0.8,relwidth=0.8)
-
-    def create_checkbox(self):
-        self.iv1 = Tkinter.IntVar()
-        self.iv1.set(0)
-        Tkinter.Radiobutton(self.bFrame, text="waveform", value=0, variable=self.iv1).place(relx=0., rely=0.15)
-        Tkinter.Radiobutton(self.bFrame, text="FFT", value=1, variable=self.iv1).place(relx=0., rely=0.25)
-        Tkinter.Radiobutton(self.bFrame, text="delay_clock", value=2, variable=self.iv1).place(relx=0., rely=0.35)
-        Tkinter.Radiobutton(self.bFrame, text="process", value=3, variable=self.iv1).place(relx=0., rely=0.45)
+        self.file_list.place(relx=0.1, rely=0.1,relheight=0.8,relwidth=0.8)
 
     def create_memobox(self):
         self.textField = Tkinter.Text(self.mFrame, relief="groove")
         #self.textField.pack(side='bottom',anchor=Tkinter.S)
-        self.textField.place(relx=0.1, rely=0.,relheight=0.6,relwidth=0.8)
+        self.textField.place(relx=0.1, rely=0.1,relheight=0.8,relwidth=0.8)
         self.textField.insert('insert','-----------Log------------\n')
 
     def create_quit(self):
         self.quit = Tkinter.Button(self.mFrame, text="EXIT", command=self.master.destroy)
-        self.quit.place(relx=0.8, rely=0.7)
+        self.quit.place(relx=0.7, rely=0.925)
         
     def reflesh(self,path=data_path):
         self.data_path = path +'/'
@@ -99,7 +87,8 @@ class Application(Tkinter.Frame):
         plt.ylim(0,16*2**14)
         plt.title(os.path.split(file_name)[1])
         plt.show()
-
+        #plt.text(num_range*1.1,2**13+2**14*ch,'ch '+str(ch))
+        #plt.show()
     def plot_process(self,file_name):
         mom = decode_process.read_process_file(file_name)
         num = len(mom[:,0])
