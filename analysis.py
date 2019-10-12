@@ -80,14 +80,15 @@ class Application(Tkinter.Frame):
         if not file_index: return
         elif os.path.isdir(file_name):
             self.reflesh(path=file_name)
-        elif 'wave' in file_name:
+        elif 'wave_2' in file_name:
             self.memo(file_name)
-            self.plot(file_name)
-        elif 'process' in file_name:
+            self.plot_wave(file_name)
+        elif 'process_2' in file_name:
             self.memo(file_name)
-            decode_process.read_process_file(file_name)
+            self.plot_process(file_name)
             
-    def plot(self,file_name):
+            
+    def plot_wave(self,file_name):
         vol = decode_wave.read_wave_file(file_name)
         num = len(vol[0])
         num_range = 64*9
@@ -96,9 +97,20 @@ class Application(Tkinter.Frame):
             plt.text(num_range*1.1,2**13+2**14*ch,'ch '+str(ch))
             [ plt.plot(x,vol[ch][i*num_range:(i+1)*num_range]+2**14*ch,c='black',linewidth=0.5) for i in range(int(num/num_range))]
         plt.ylim(0,16*2**14)
-        plt.title(file_name)
+        plt.title(os.path.split(file_name)[1])
         plt.show()
-            
+
+    def plot_process(self,file_name):
+        mom = decode_process.read_process_file(file_name)
+        num = len(mom[:,0])
+        x = range(num)
+        for j in range(16):
+            #plt.text(num_range*1.1,2**13+2**14*ch,'ch '+str(ch))
+            plt.plot(x,mom[:,j],linewidth=0.5)
+        #plt.ylim(0,16*2**14)
+        plt.title(os.path.split(file_name)[1])
+        plt.show()
+
 
     def memo(self,file_name):
         file_name = file_name.replace('.dat','.txt')
