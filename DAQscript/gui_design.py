@@ -1,6 +1,8 @@
 
-#import Tkinter
-import tkinter as Tkinter
+import sys
+ver_python = sys.version_info[0]
+if ver_python == 2:import Tkinter
+else : import tkinter as Tkinter
 
 class Design(Tkinter.Frame,object):
     def __init__(self, master=Tkinter.Tk()):

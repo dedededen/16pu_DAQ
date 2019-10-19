@@ -1,4 +1,5 @@
 
+## python2&3  ok
 import  numpy as np
 import struct
 
