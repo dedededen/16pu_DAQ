@@ -12,12 +12,12 @@ def read_wave_file(fName):
     index = timestamplength
     for ch in range(16):
         #if b'wave' not in readX(fid,"4s",index) : print("ERROR: Header")
-        while b'wave'+bytearray([ch]) not in readX(fid,"5s",index):
+        while b'wave'+bytearray([ch]) != readX(fid,"5s",index):
             index += 1
         header_index = index
         fotter_index = header_index + headerLength + DataLength * 2
         #print(readX(fid,"10s",fotter_index+6))
-        if b'data'+bytearray([ch]) not in readX(fid,"5s",fotter_index) :
+        if b'data'+bytearray([ch]) != readX(fid,"5s",fotter_index) :
             print("ERROR: Data length is not match.")
         index = fotter_index #+ headerLength
         data_number = int( (-header_index + fotter_index - 6)/2)
