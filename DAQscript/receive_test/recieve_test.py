@@ -2,7 +2,7 @@
 ### UDP receive test ###
 
 from socket import socket, AF_INET, SOCK_DGRAM
-HOST = '192.168.10.16'
+HOST = '127.0.0.1'
 PORT = 4660
 
 s = socket(AF_INET, SOCK_DGRAM)

@@ -2,9 +2,9 @@
 #import Tkinter
 import tkinter as Tkinter
 
-class Design(Tkinter.Frame):
+class Design(Tkinter.Frame,object):
     def __init__(self, master=Tkinter.Tk()):
-        super().__init__(master,width=600, height=450)
+        super(Design,self).__init__(master,width=600, height=450)
         self.master.title(u"DAQ of 16-electrodes monitor")
         self.pack()
         self.create_frame()

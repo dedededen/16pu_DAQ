@@ -112,7 +112,20 @@ def set_test_triger(sock,id_num):
     sock.send(bytearray(sndHeader))
     sock.recvfrom(2048)#'a'
     id_num[0] = sndHeader[2] +1
-    print(id_num[0])
+    return
+
+def reset_sitcp(sock,id_num):
+    sndHeader = [ RBCP_VER , RBCP_CMD_WR, id_num[0],1,
+                 0,0,0,38,
+                 1]
+    sock.send(bytearray(sndHeader))    
+    sock.recvfrom(2048)#'a'
+    sndHeader[2] += 1
+    sndHeader[8] = 0
+    #time.sleep(1)
+    sock.send(bytearray(sndHeader))
+    sock.recvfrom(2048)#'a'
+    id_num[0] = sndHeader[2] +1
     return
 
 ################################################################

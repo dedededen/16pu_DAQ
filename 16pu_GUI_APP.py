@@ -7,7 +7,7 @@ import DAQscript.control as control
 import DAQscript.gui_design as gui_design
 import os
 
-class Application(gui_design.Design):
+class Application(gui_design.Design,object):
     def __init__(self, ipAddr="10.72.108.43",#"127.0.0.1",
                  rbcpPort=4660,
                  tcpPort=24,
@@ -24,6 +24,8 @@ class Application(gui_design.Design):
         
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,0)
         self.sock.connect((ipAddr,rbcpPort))
+        ### test
+        control.reset_sitcp(self.sock,self.RBCP_ID) 
         super().__init__()
         self.B_get_data.configure(command = self._get_data)
         self._print_time()
