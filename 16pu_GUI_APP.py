@@ -6,9 +6,11 @@ import time
 import DAQscript.control as control
 import DAQscript.gui_design as gui_design
 import os
+import sys
 
 class Application(gui_design.Design,object):
     def __init__(self, ipAddr="10.72.108.43",#"127.0.0.1",
+                 address_num=13,
                  rbcpPort=4660,
                  tcpPort=24,
                  gain_file='./DAQscript/gain/gain_test.txt',
@@ -87,6 +89,19 @@ class Application(gui_design.Design,object):
         self.insert_log_format()
         
 if __name__=="__main__":
-    app = Application()
+    args = sys.argv
+    if len(args) < 2:
+        print("ERROR : use \"python 16pu_GUI_APP.py 13or15\"")
+        sys.exit()
+    address_num = int(args[1])
+    if address_num == 13:
+        print("Begin DAQ script for # 13")    
+    elif address_num == 15:
+        print("Begin DAQ script for # 13")
+    else:
+        print("ERROR : use \"python 16pu_GUI_APP.py 13or15\"")
+        sys.exit()
+
+    app = Application(address_num)
     app.mainloop()
     app.sock.close()

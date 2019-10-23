@@ -9,20 +9,20 @@ import datetime
 import os
 
 import matplotlib.pyplot as plt
-from analysis import decode_wave
-from analysis import decode_process
-from analysis import goertzel
+import decode_wave
+import decode_process
+import goertzel
 
 size = [800,700]
 geometry_size = str(size[0]) +"x"+str(size[1])
-data_path = './data'
+data_path = '../data'
 
 class Application(Tkinter.Frame,object):
     def __init__(self, master=None):
         super(Application,self).__init__(master,width=size[0], height=size[1])
         self.master.title(u"Analysis of 16-electrodes monitor")
         self.master.geometry(geometry_size)
-        self.data_path = './data'        
+        self.data_path = data_path
         self.pack()
         self.create_frame()
         self.create_widgets()
@@ -83,6 +83,7 @@ class Application(Tkinter.Frame,object):
         vol = decode_wave.read_wave_file(file_name)
         num = len(vol[0])
         num_range = 64*9
+        #x = range(num)
         x = range(num_range)
         
         # ## test for delay clock
@@ -99,14 +100,15 @@ class Application(Tkinter.Frame,object):
             plt.text(num_range*1.05,2**13+2**14*ch,'Max '+str(vol_max))
             plt.text(num_range*1.05,2**12+2**14*ch,'Min '+str(vol_min))
             plt.text(num_range*1.05,2**10+2**14*ch,'p-p '+str(vol_max-vol_min))
-            
+
+            #plt.plot(x,vol[ch]+2**14*ch,c='blue',linewidth=0.5)
             [ plt.plot(x,vol[ch][i*num_range:(i+1)*num_range]+2**14*ch,c='blue',linewidth=0.5)
              for i in range(int(num/num_range))]
         plt.ylim(0,16*2**14)
         plt.xlim(0,num_range)
         plt.title(os.path.split(file_name)[1])
         #plt.tight_layout()
-        plt.ylabel('ADC count + $2^{14}$*ch')
+        plt.ylabel('ADC count + 2^{14}*ch')
         plt.xlabel('sampling number % 1 turn')
         plt.grid()
         #plt.show()
