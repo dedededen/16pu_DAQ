@@ -15,7 +15,7 @@ import goertzel
 
 size = [800,700]
 geometry_size = str(size[0]) +"x"+str(size[1])
-data_path = '../data'
+data_path = './data'
 
 class Application(Tkinter.Frame,object):
     def __init__(self, master=None):
