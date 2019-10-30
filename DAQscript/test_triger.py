@@ -1,9 +1,15 @@
 
 import socket
 import sys
+import sys
+ver_python = sys.version_info[0]
+if ver_python == 2:import Tkinter
+else : import tkinter as Tkinter
+
 import control
 import tkinter as Tkinter
 import time
+
 def trigger():
     ipAddr ="10.72.108.43"
     rbcpPort = 4660

@@ -15,7 +15,7 @@ import goertzel
 
 size = [800,700]
 geometry_size = str(size[0]) +"x"+str(size[1])
-data_path = './data'
+data_path = '/jkdata/jkpublic/accbmon/mrbmon/16pu_data'
 
 class Application(Tkinter.Frame,object):
     def __init__(self, master=None):
@@ -103,7 +103,7 @@ class Application(Tkinter.Frame,object):
 
             #plt.plot(x,vol[ch]+2**14*ch,c='blue',linewidth=0.5)
             [ plt.plot(x,vol[ch][i*num_range:(i+1)*num_range]+2**14*ch,c='blue',linewidth=0.5)
-             for i in range(int(num/num_range))]
+             for i in range(1)]#range(int(num/num_range))]
         plt.ylim(0,16*2**14)
         plt.xlim(0,num_range)
         plt.title(os.path.split(file_name)[1])

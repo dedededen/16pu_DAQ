@@ -1,11 +1,13 @@
-
+import sys
+ver_python = sys.version_info[0]
+    
 import socket
 import select
 import time
 
 import datetime
 import os
-
+from struct import unpack
 ################################################################
 #### RBCP Command                                           ####
 ####  sndHeader :                                           ####
@@ -36,6 +38,7 @@ def check(sock,id_num):
     id_num[0] = sndHeader[2] + 1
     recvData,ip_data = sock.recvfrom(2048)#'a'
     recvBytes = len(recvData) ## recv
+    if ver_python == 2: recvData = [unpack('B',recvData[i])[0] for i in range(recvBytes)]
     #print(recvData)
     #print(recvBytes)
     if recvBytes < 30:
@@ -50,7 +53,8 @@ def check(sock,id_num):
     elif int(recvData[offset+0]) == 2: print("MODE : wave")
     elif int(recvData[offset+0]) == 3: print("MODE : ready")
     print(" GAIN")
-    [print("\tpick up "+str(ch) +" : " +str(int(recvData[offset+2*ch+1])/128.+ int(recvData[offset+2*ch+2])/32768.) ) for ch in range(16)]
+    for ch in range(16):
+        print("\tpick up "+str(ch) +" : " +str(int(recvData[offset+2*ch+1])/128.+ int(recvData[offset+2*ch+2])/32768.) ) 
     print(" DATA # : " + str( int(recvData[offset+33])*65536 +
                              int(recvData[offset+34])*256 +
                              int(recvData[offset+35]) ))
@@ -114,6 +118,7 @@ def set_test_triger(sock,id_num):
     id_num[0] = sndHeader[2] +1
     return
 
+## delete ok
 def reset_sitcp(sock,id_num):
     sndHeader = [ RBCP_VER , RBCP_CMD_WR, id_num[0],1,
                  0,0,0,38,
@@ -134,9 +139,12 @@ def reset_sitcp(sock,id_num):
 ################################################################
 READING_BUF_SIZE = 2048
 BUF_SIZE = 40
-header_ex = [ b"TRANSVERSE MOMENTs measured with sixteen-pu-monitor at address 15",b'wave\x00']
-footer_ex = [ b"DATA processed with the 16-pu-monitor circuit",b'data\x0f']
-#footer_ex = [ b"DATA proces",b'data\x0f']
+header_ex = [ b"TRANSVERSE MOMENTs measured with sixteen-pu-monitor at address 15",b'wave']
+footer_ex = [ b"DATA processed with the 16-pu-monitor circuit",b'data']
+if ver_python == 2:
+   header_ex = [ "TRANSVERSE MOMENTs measured with sixteen-pu-monitor at address 15",'wave']
+   footer_ex = [ "DATA processed with the 16-pu-monitor circuit",'data']
+ 
 def receive_data(sock, header=header_ex[0], footer=footer_ex[0],datapath='./data/',
                  filename=None,flag=0):
     recvData = sock.recv(READING_BUF_SIZE)
@@ -172,7 +180,7 @@ def receive_data(sock, header=header_ex[0], footer=footer_ex[0],datapath='./data
         recvData = recvData[len(recvData) - BUF_SIZE:]
     fd.close()
     #print('data stop')
-    #os.chmod(filename,0777)
+    os.chmod(filename,0o777)
     return filename
 
 def get_wave(sock,sockTCP,id_num,process_fname):
@@ -187,13 +195,13 @@ def get_wave(sock,sockTCP,id_num,process_fname):
         #sock.send(bytearray(sndHeader))
         #sock.recvfrom(2048)#'a'
         if ch ==0:set_mode(sock,id_num,3)
-        receive_data(sockTCP,header=b'wave'+bytearray([ch]),footer=b'data'+bytearray([ch]),flag=ch,filename=fname)
+        receive_data(sockTCP,header=header_ex[1], footer=footer_ex[1],flag=ch,filename=fname)
         #time.sleep(0.1)
         #time.sleep(0.08)
         sndHeader[3] += 1
     sndHeader[8] = 15
     sock.send(bytearray(sndHeader))
-    receive_data(sockTCP,header=b'wave'+bytearray([15]),footer=b'data'+bytearray([15]),flag=ch,filename=fname)
+    receive_data(sockTCP,header=header_ex[1], footer=footer_ex[1],flag=ch,filename=fname)
     #sock.send(bytearray(sndHeader))
     sock.recvfrom(4096)#'a'
     #sock.recvfrom(2048)#'a'
