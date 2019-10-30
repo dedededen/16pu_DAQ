@@ -156,7 +156,7 @@ def receive_data(sock, header=header_ex[0], footer=footer_ex[0],datapath='./data
                 if filename == None:
                     filename = datapath +'process_data/process_'+ dt_time + '.dat'
                     print(filename)
-                fd = open(filename,'ba')
+                fd = open(filename,'ab')
                 if flag ==0 : fd.write(dt_time.encode())
                 if footer in recvData:
                     index = recvData.find(footer)
