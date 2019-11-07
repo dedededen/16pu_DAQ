@@ -34,10 +34,10 @@ class Design(Tkinter.Frame,object):
                             variable=self.num_mode).place(relx=0.4, rely=y)
 
         y += 0.2
-        Tkinter.Label(self.sFrame,text=u'Delay Clock').place(relx=0.1, rely=y)
-        self.timing_Box = Tkinter.Entry(self.sFrame,width=8)
-        self.timing_Box.insert(Tkinter.END,0)
-        self.timing_Box.place(relx=0.3, rely=y)
+        Tkinter.Label(self.sFrame,text=u'Bunch Number\n(process)').place(relx=0.1, rely=y)
+        self.bunch_num_Box = Tkinter.Entry(self.sFrame,width=8)
+        self.bunch_num_Box.insert(Tkinter.END,100)
+        self.bunch_num_Box.place(relx=0.3, rely=y)
 
         y += 0.2
         Tkinter.Label(self.sFrame,text=u'Shot Number').place(relx=0.1, rely=y)
@@ -54,6 +54,7 @@ class Design(Tkinter.Frame,object):
         self.mtextField.place(relx=0.1, rely=0.1,relheight=0.6,relwidth=0.8)
         self.insert_log_format()
         Tkinter.Button(self.mFrame, text="EXIT", command=self.master.destroy).place(relx=0.8, rely=0.8)
+
     def insert_log_format(self):
         self.mtextField.delete('1.0','end')
         self.mtextField.insert('insert','Shot Number :\t\n')

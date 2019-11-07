@@ -52,13 +52,13 @@ def check(sock,id_num):
     if int(recvData[offset+0]) == 0: print("MODE : process")
     elif int(recvData[offset+0]) == 2: print("MODE : wave")
     elif int(recvData[offset+0]) == 3: print("MODE : ready")
-    print(" GAIN")
-    for ch in range(16):
-        print("\tpick up "+str(ch) +" : " +str(int(recvData[offset+2*ch+1])/128.+ int(recvData[offset+2*ch+2])/32768.) ) 
+    # print(" GAIN")
+    # for ch in range(16):
+    #     print("\tpick up "+str(ch) +" : " +str(int(recvData[offset+2*ch+1])/128.+ int(recvData[offset+2*ch+2])/32768.) ) 
     print(" DATA # : " + str( int(recvData[offset+33])*65536 +
                              int(recvData[offset+34])*256 +
                              int(recvData[offset+35]) ))
-    print(" Delay_Clock : " + str(recvData[offset+39]))
+    #print(" Delay_Clock : " + str(recvData[offset+39]))
 
     
     if(recvData[offset+0] == 2 or recvData[offset+0] == 1):
@@ -118,11 +118,10 @@ def set_test_triger(sock,id_num):
     id_num[0] = sndHeader[2] +1
     return
 
-## delete ok
 def reset_sitcp(sock,id_num):
     sndHeader = [ RBCP_VER , RBCP_CMD_WR, id_num[0],1,
-                 0,0,0,38,
-                 1]
+                 0xFF,0xFF,0xFF,0x10,
+                 0x80]
     sock.send(bytearray(sndHeader))    
     sock.recvfrom(2048)#'a'
     sndHeader[2] += 1

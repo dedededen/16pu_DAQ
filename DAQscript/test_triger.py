@@ -7,7 +7,6 @@ if ver_python == 2:import Tkinter
 else : import tkinter as Tkinter
 
 import control
-import tkinter as Tkinter
 import time
 
 def trigger():

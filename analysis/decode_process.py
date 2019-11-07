@@ -29,6 +29,8 @@ def read_process_file(fName):
         data_per_bunch = np.zeros(16)
         data_number = struct.unpack('B',fid.read(1))[0]*256+struct.unpack('B',fid.read(1))[0];
         #print(data_number)
+        if data_number != i:
+            break
         for j in range(16):
             data_0 = struct.unpack('B',fid.read(1))[0] 
             #print(data_0)
@@ -42,7 +44,7 @@ def read_process_file(fName):
         mom.append(data_per_bunch)
     if Footer != struct.unpack('45s',fid.read(45))[0]:
         print('Error: Footer')        
-        return
+        #return
     return np.array(mom)
     
 if __name__=='__main__':
