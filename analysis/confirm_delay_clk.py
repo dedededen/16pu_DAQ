@@ -117,7 +117,7 @@ class Application(Tkinter.Frame,object):
         vol = decode_wave.read_wave_file(file_name)
         a = waveform_analysis.cal_offset(vol)
         print('clk delay  :' +str(a[0]+a[1]*52*9))
-        num_range = 64 *9#52 * 9
+        num_range = 52 * 9
         x = range(num_range)
         ch  = 0
         plt.figure(figsize=(15,9))

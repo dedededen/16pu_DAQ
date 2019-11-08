@@ -138,7 +138,8 @@ def reset_sitcp(sock,id_num):
 ################################################################
 READING_BUF_SIZE = 2048
 BUF_SIZE = 40
-header_ex = [ b"TRANSVERSE MOMENTs measured with sixteen-pu-monitor at address 15",b'wave']
+#header_ex = [ b"TRANSVERSE MOMENTs measured with sixteen-pu-monitor at address 15",b'wave']
+header_ex = [ b"TRANSVERS",b'wave']
 footer_ex = [ b"DATA processed with the 16-pu-monitor circuit",b'data']
 if ver_python == 2:
    header_ex = [ "TRANSVERSE MOMENTs measured with sixteen-pu-monitor at address 15",'wave']

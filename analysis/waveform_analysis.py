@@ -50,9 +50,9 @@ def plot_wave(file_name):
         teibai = 52
         mon = 1
     vol = decode_wave.read_wave_file(file_name)
-    offset,off2 = cal_offset(vol,teibai)
+    #offset,off2 = cal_offset(vol,teibai)
     num = len(vol[0])
-    num_range = teibai*9
+    num_range = teibai * 9
     #x = range(num)
     x = range(num_range)        
     fig = plt.figure(figsize=(15,9))
@@ -63,12 +63,12 @@ def plot_wave(file_name):
         print('Max '+str(vol_max)),
         print('Min '+str(vol_min)),
         print('p-p '+str(vol_max-vol_min))
-        # plt.text(num_range*1.,2**13+2**14*ch,'ch '+str(ch))
+        #plt.text(num_range*1.,2**13+2**14*ch,'ch '+str(ch))
         #plt.text(num_range*1.05,2**13+2**14*ch,'Max '+str(vol_max))
         #plt.text(num_range*1.05,2**12+2**14*ch,'Min '+str(vol_min))
         #plt.text(num_range*1.05,2**10+2**14*ch,'p-p '+str(vol_max-vol_min))
         plt.subplot(4,4,ch+1)
-        [ plt.plot(x,vol[ch][offset+i*num_range:offset +(i+1)*num_range],c='blue',linewidth=0.5)  for i in range(off2,int(num/num_range-1 - off2))]
+        [ plt.plot(x,vol[ch][i*num_range:(i+1)*num_range],c='blue',linewidth=0.5)  for i in range(10)]
         [ plt.axvline(x=52*(i+1),color='black',alpha=0.5 )for i in range(9)]
     fig.suptitle(os.path.split(file_name)[1], fontsize=20)
     plt.ylabel('ADC count')
@@ -83,12 +83,11 @@ def plot_wave(file_name):
 def cal_bunch_moment(vol,teibai=52,mon=0):
     #vol = decode_wave.read_wave_file(file_name)
     bunch_of,off2 =cal_offset(vol)
-    num = int((len(vol[0])-bunch_of)/teibai) - off2*9 - 1
+    num = int((len(vol[0])-bunch_of)/teibai) - off2*9 - 11
     moment = []
     
     for i in range(num):
         hoge = off2*teibai*9 + bunch_of +teibai*i
-
         buf= [ goertzel(vol[ch][hoge:hoge+teibai],2)[0]
               for ch in range(16)]# 11/4[4,3,2,1,0,15,14,13,12,11,10,9,8,7,6,5]]
 #range(16)]
@@ -101,7 +100,7 @@ def cal_reflectance(vol,teibai=52,mon=0):
     #vol = decode_wave.read_wave_file(file_name)
     amplitude= []
     phase = []
-    num = int((len(vol[0]))/teibai)
+    num = int((len(vol[0]))/teibai-2)
     for i in range(num):
         hoge = teibai*i
         ch = 14
@@ -134,11 +133,11 @@ def plot_bunch_moment(file_name,vol,mon):#,file_name):
     fig = plt.figure()#figsize=(15,9))
     fig.suptitle(os.path.split(file_name)[1], fontsize=20)
     plt.subplots_adjust(top=0.9)
-    num_bun = 1
+    num_bun = 8
     ax1 = fig.add_subplot(2, 2, 1)
     for i in range(num_bun):
         x = range(len(moment[i:1000:9,1]))
-        ax1.plot(x,moment[i:1000:9,1],label='bunch: '+str(i),marker='o')
+        ax1.plot(x,moment[i:1000:9,1],label='bunch: '+str(i),marker='o') 
     ax1.legend()
     ax1.set_ylabel('x[mm]')
     ax1.set_xlabel('turn')
