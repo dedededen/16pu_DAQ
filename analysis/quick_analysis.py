@@ -1,98 +1,92 @@
 
+from gui_design import gui
 import sys
-ver_python = sys.version_info[0]
-if ver_python == 2:import Tkinter
-else : import tkinter as Tkinter
-import numpy as np
-import subprocess
-import datetime
 import os
-
 import matplotlib.pyplot as plt
-import decode_wave
-import decode_process
-import waveform_analysis
-import process_analysis
+import numpy as np
 
-size = [800,700]
-geometry_size = str(size[0]) +"x"+str(size[1])
-data_path = '/jkdata/jkpublic/accbmon/mrbmon/16pu_data'
+from wave import plot_tmg
+from wave import plot_wave
+from wave import plot_bunch_moment
+from wave import plot_fft
+from wave import reflectance
+from wave import plot_all_mom
+from process import plot_process
+from process import plot_process_mom
+from process import process_ref
+from noise import noise_analysis
 
-class Application(Tkinter.Frame,object):
-    def __init__(self, master=None):
-        super(Application,self).__init__(master,width=size[0], height=size[1])
-        self.master.title(u"Analysis of 16-electrodes monitor")
-        self.master.geometry(geometry_size)
-        self.data_path = data_path
-        self.pack()
-        self.create_frame()
-        self.create_widgets()
-        self.create_quit()
-        self.create_memobox()
+mode = {0:'Beam data',1:'Adjustment of timing',2:'Noise',3:'Reflectance',4:'all'}
 
-    def create_frame(self):
-        self.lFrame = Tkinter.Frame(self.master)
-        self.lFrame.place(relx=0, rely=0,relwidth=0.5,relheight=1)
+class Application(gui.Design,object):
+    def __init__(self,mode=0):
+        super(Application,self).__init__()
+        self.mode_num = mode
+        self.select.configure(command=self._select)
 
-        self.mFrame = Tkinter.Frame(self.master)
-        self.mFrame.place(relx=0.5, rely=0, relwidth=0.5, relheight=1)
-        
-    def create_widgets(self):
-        self.select = Tkinter.Button(self.lFrame, text="select", command=self.select)
-        self.select.place(relx=0.7, rely=0.925)
-        
-        self.file_list = Tkinter.Listbox(self.lFrame ,selectmode='browse')
-        self.reflesh()
-        self.file_list.place(relx=0.1, rely=0.1,relheight=0.8,relwidth=0.8)
-
-    def create_memobox(self):
-        self.textField = Tkinter.Text(self.mFrame, relief="groove")
-        #self.textField.pack(side='bottom',anchor=Tkinter.S)
-        self.textField.place(relx=0.1, rely=0.1,relheight=0.8,relwidth=0.8)
-        self.textField.insert('insert','-----------Log------------\n')
-
-    def create_quit(self):
-        self.quit = Tkinter.Button(self.mFrame, text="EXIT", command=self.master.destroy)
-        self.quit.place(relx=0.7, rely=0.925)
-        
-    def reflesh(self,path=data_path):
-        self.data_path = path +'/'
-        self.file_list.delete(0,'end')
-        files = os.listdir(path)
-        self.file_list.insert(1, './')
-        self.file_list.insert(2, '../')
-        for i in range(len(files)):
-            self.file_list.insert(i+3, '  '+files[i])
-        #self.file_list.pack()
-        
-    def select(self):
+    def _select(self):
         file_index = self.file_list.curselection()
         file_name = self.data_path+self.file_list.get(file_index[0]).replace('  ','')
         if not file_index: return
         elif os.path.isdir(file_name):
             self.reflesh(path=file_name)
-        elif 'wave_2' in file_name:
-            self.memo(file_name)
-            vol = waveform_analysis.plot_wave(file_name)
-            waveform_analysis.plot_fft(file_name,vol)
-        elif 'process_2' in file_name:
-            self.memo(file_name)
-            process_analysis.plot_process(file_name)
-            
-    def memo(self,file_name):
-        file_name = file_name.replace('.dat','.txt')
-        file_name = file_name.replace('wave_data','log')
-        file_name = file_name.replace('process_data','log')
-        file_name = file_name.replace('wave','log')
-        file_name = file_name.replace('process','log')
-        self.textField.delete('1.0','end')
-        if os.path.exists(file_name):
-            fd = open(file_name,'r')
-            out = fd.read()
-            self.textField.insert('insert',out)
-        else:
-            self.textField.insert('insert','Log is not exist\n')
+        else : self.act_mode(file_name=file_name)
 
-root = Tkinter.Tk()
-app = Application(master=root)
-app.mainloop()
+    def act_mode(self,file_name):
+        print(self.mode_num)
+        ### beam time
+        if self.mode_num == 0:
+            if 'wave_2' in file_name:
+                self.memo(file_name)
+                vol,mon = plot_wave.plot_wave(file_name)
+                plot_bunch_moment.plot_bunch_moment(file_name,vol,mon)
+                plot_fft.plot_fft(file_name,vol)
+            elif 'process_2' in file_name:
+                self.memo(file_name)
+                vol = plot_process.plot_process(file_name)
+                plot_process_mom.plot_process_mom(file_name,vol)
+        ### adjust timing
+        elif self.mode_num == 1:
+            print(file_name)
+            if 'wave_2' in file_name:
+                self.memo(file_name)
+                plot_tmg.plot_timing(file_name)
+        ### noise
+        elif self.mode_num == 2:
+            if 'wave_2' in file_name:
+                self.memo(file_name)
+                noise_analysis.wave_noise(file_name)
+            elif 'process_2' in file_name:
+                self.memo(file_name)
+                noise_analysis.process_noise(file_name)
+        ### reflectance
+        elif self.mode_num == 3:
+            if 'wave_2' in file_name:
+                self.memo(file_name)
+                reflectance.plot_relation_reflectance(file_name)
+            elif 'process_2' in file_name:
+                self.memo(file_name)
+                process_ref.plot_process_ref(file_name)
+        ### all
+        elif self.mode_num == 4:
+            if 'wave_2' in file_name[0]:
+                self.memo(file_name[0])
+                plot_all_mom.plot_mom(file_name)
+            elif 'process_2' in file_name[0]:
+                self.memo(file_name[0])
+                
+                
+
+if __name__=="__main__":
+    args = sys.argv
+    if len(sys.argv) == 1:
+        print('argv is None.')
+        print('[USAGE]: python quick_analysis.py #mode number')
+        for i in range(len(mode)):
+            print('\t mode ' +str(i) +' : ' +mode[i])
+    else:
+        print('Begin in mode ' + str(args[1]) +'\t'+ mode[int(args[1])])
+        app = Application(mode=int(args[1]))
+        app.mainloop()
+    
+    

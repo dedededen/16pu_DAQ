@@ -42,7 +42,7 @@ class Design(Tkinter.Frame,object):
         y += 0.2
         Tkinter.Label(self.sFrame,text=u'Shot Number').place(relx=0.1, rely=y)
         self.shot_number_Box = Tkinter.Entry(self.sFrame,width=8)
-        self.shot_number_Box.insert(Tkinter.END,0)
+        self.shot_number_Box.insert(Tkinter.END,1)
         self.shot_number_Box.place(relx=0.3, rely=y)
 
         y = 0.7
