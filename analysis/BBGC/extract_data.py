@@ -7,7 +7,7 @@ import decode_process
 data_path = '/jkdata/jkpublic/accbmon/mrbmon/16pu_data/temp/'
 bunch_num = 1
 data_start = 1
-data_end = 100
+data_end = 11
 
 def extract_vol():
     measure_vol = []
