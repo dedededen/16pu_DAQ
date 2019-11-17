@@ -5,9 +5,10 @@ import os
 import decode_process
 
 data_path = '/jkdata/jkpublic/accbmon/mrbmon/16pu_data/temp/'
-bunch_num = 1
+bunch_num = 2
+threshold = 90
 data_start = 1
-data_end = 11
+data_end = 101
 
 def extract_vol():
     measure_vol = []
@@ -19,7 +20,7 @@ def extract_vol():
             measure_vol.append(vol_buf[i*9 + (bunch_num-1)])
     np.savetxt('./vol.txt',measure_vol)
     measure_vol = np.array(measure_vol)
+    
     print(measure_vol.shape)
     return measure_vol
-
 extract_vol()    

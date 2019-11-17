@@ -136,7 +136,7 @@ def reset_sitcp(sock,id_num):
 #### TCP                                                    ####
 ####  Readout data                                          ####
 ################################################################
-READING_BUF_SIZE = 2048
+READING_BUF_SIZE = 2**14#2048
 BUF_SIZE = 40
 #header_ex = [ b"TRANSVERSE MOMENTs measured with sixteen-pu-monitor at address 15",b'wave']
 header_ex = [ b"TRANSVERS",b'wave']
@@ -190,6 +190,7 @@ def get_wave(sock,sockTCP,id_num,process_fname):
     fname = process_fname.replace('process','wave')
     print('Begining : get_wave')
     for ch in range(15):
+        print(ch)
         sndHeader[8] = ch
         sock.send(bytearray(sndHeader))
         #sock.send(bytearray(sndHeader))

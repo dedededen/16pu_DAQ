@@ -15,10 +15,9 @@ def plot_timing(file_name):
     ch  = 0
     plt.figure(figsize=(15,9))
     [ plt.plot(x,vol[ch][num_range*i:num_range*(i+1) ],linewidth=0.5,marker='v',markersize=1,c='blue',label=str(ch)) for i in range(10)]
-    ch  = 14
-    [ plt.plot(x,vol[ch][num_range*i:num_range*(i+1) ],linewidth=0.5,marker='v',markersize=1,c='red',label=str(ch)) for i in range(10)]
+    ch  = 12
+    [ plt.plot(x,vol[ch][num_range*i:num_range*(i+1) ],linewidth=0.5,marker='v',markersize=1,c='red',label=str(ch)) for i in range(100)]
     [ plt.axvline(x=52*(i+1),color='black',alpha=0.5 )for i in range(9)]
-    plt.legend()
     plt.title(os.path.split(file_name)[1])
     plt.ylabel('ADC count')
     plt.xlabel('sampling num')

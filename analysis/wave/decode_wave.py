@@ -28,6 +28,13 @@ def read_wave_file(fName):
             [ struct.unpack('B',fid.read(1))[0] * 64 +
              struct.unpack('B',fid.read(1))[0] /4 for i in range(data_number)]
             )
+    if 'address13' in fName:
+        vol[10],vol[11] = vol[11],vol[10]
+    elif 'address15' in fName:
+        pass
+    else:
+        vol[10],vol[11] = vol[11],vol[10]
+
     return np.array(vol)
 
 def readX( fid, fmt, adr=None ):

@@ -10,7 +10,7 @@ def plot_bunch_moment(file_name,vol,mon):
     fig = plt.figure()#figsize=(15,9))
     fig.suptitle(os.path.split(file_name)[1], fontsize=20)
     plt.subplots_adjust(top=0.9)
-    num_bun = 8
+    num_bun = 2
     ax1 = fig.add_subplot(2, 2, 1)
     for i in range(num_bun):
         x = range(len(moment[i:1000:9,1]))

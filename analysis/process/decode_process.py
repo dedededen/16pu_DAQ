@@ -43,10 +43,20 @@ def read_process_file(fName):
             else:
                 data_per_bunch[j] = frac * 2**exp *(-1) * constant
         mom.append(data_per_bunch)
+
     if Footer != struct.unpack('45s',fid.read(45))[0]:
         print('Error: Footer')        
         #return
-    return np.array(mom)
+    mom = np.array(mom)
+    if 'address13' in fName:
+        mom[:,10],mom[:,11] = mom[:,11],mom[:,10]
+        print('ad')
+    elif 'address15' in fName:
+        pass
+    else:
+        mom[:,10],mom[:,11] = mom[:,11],mom[:,10]
+        print('ad')
+    return mom
     
 if __name__=='__main__':
     ifile ='./data/wave_data/wave_822.dat'
