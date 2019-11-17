@@ -69,8 +69,12 @@ def plot_process_mom(file_name,vol):
     for i in range(num_bun):
         if bunch_on[i] == 0:
             continue
-        x = np.linspace(0,1,len(moment[i][:fft_num,1]))#range(len(moment[i][:,1]))
-        ax1.plot(x,np.abs(np.fft.fft(moment[i][:fft_num,1]))/fft_num*2,label='bunch: '+str(i),marker='o',markersize =7) 
+        fft = np.fft.fft(moment[i][:fft_num,1])
+        fft_abs = np.abs(fft) /fft_num*2
+        max_index = np.argmax(fft_abs[int(fft_num*0.2):int(fft_num*0.5)]) + int(fft_num*0.2)
+        x = np.linspace(0,1,len(moment[i][:fft_num,2]))#range(len(moment[i][:,1]))
+        print('Dip. x Osc. max: ' + str(fft_abs[max_index])+'   Tune: ' + str(x[max_index])+ '   phase: ' + str(cmath.phase(fft[max_index])))
+        ax1.plot(x,fft_abs,label='bunch: '+str(i),marker='o',markersize =7) 
         ax1.set_xlim(x[1],0.5)
     ax1.legend()
     ax1.set_yscale('log')
@@ -82,8 +86,12 @@ def plot_process_mom(file_name,vol):
     for i in range(num_bun):
         if bunch_on[i] == 0:
             continue
+        fft = np.fft.fft(moment[i][:fft_num,2])
+        fft_abs = np.abs(fft) /fft_num*2
+        max_index = np.argmax(fft_abs[int(fft_num*0.2):int(fft_num*0.5)]) + int(fft_num*0.2)
         x = np.linspace(0,1,len(moment[i][:fft_num,2]))#range(len(moment[i][:,1]))
-        ax1_1.plot(x,np.abs(np.fft.fft(moment[i][:fft_num,2]))/fft_num*2,label='bunch: '+str(i),marker='o',markersize =7) 
+        print('Dip. y Osc. max: ' + str(fft_abs[max_index])+'   Tune: ' + str(x[max_index])+ '   phase: ' + str(cmath.phase(fft[max_index])))
+        ax1_1.plot(x,fft_abs,label='bunch: '+str(i),marker='o',markersize =7) 
         ax1_1.set_xlim(x[1],0.5)
     ax1_1.legend()
 
