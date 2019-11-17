@@ -3,6 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import cmath
 
 
 from process import cal_process_mom
@@ -69,7 +70,7 @@ def plot_process_mom(file_name,vol):
         if bunch_on[i] == 0:
             continue
         x = np.linspace(0,1,len(moment[i][:fft_num,1]))#range(len(moment[i][:,1]))
-        ax1.plot(x,np.abs(np.fft.fft(moment[i][:fft_num,1])),label='bunch: '+str(i),marker='o',markersize =7) 
+        ax1.plot(x,np.abs(np.fft.fft(moment[i][:fft_num,1]))/fft_num*2,label='bunch: '+str(i),marker='o',markersize =7) 
         ax1.set_xlim(x[1],0.5)
     ax1.legend()
     ax1.set_yscale('log')
@@ -82,7 +83,7 @@ def plot_process_mom(file_name,vol):
         if bunch_on[i] == 0:
             continue
         x = np.linspace(0,1,len(moment[i][:fft_num,2]))#range(len(moment[i][:,1]))
-        ax1_1.plot(x,np.abs(np.fft.fft(moment[i][:fft_num,2])),label='bunch: '+str(i),marker='o',markersize =7) 
+        ax1_1.plot(x,np.abs(np.fft.fft(moment[i][:fft_num,2]))/fft_num*2,label='bunch: '+str(i),marker='o',markersize =7) 
         ax1_1.set_xlim(x[1],0.5)
     ax1_1.legend()
 
@@ -97,7 +98,11 @@ def plot_process_mom(file_name,vol):
         if bunch_on[i] == 0:
             continue
         x = np.linspace(0,1,len(moment[i][:fft_num,3]))#range(len(moment[i][:,1]))
-        ax2.plot(x,np.abs(np.fft.fft(moment[i][:fft_num,3])),label='bunch: '+str(i),marker='o',markersize =7) 
+        fft = np.fft.fft(moment[i][:fft_num,3])
+        fft_abs = np.abs(fft) /fft_num*2
+        max_index = np.argmax(fft_abs[3:]) + 3
+        print('Quad. Osc. max: ' + str(fft_abs[max_index])+'   Tune: ' + str(x[max_index])+ '   phase: ' + str(cmath.phase(fft[max_index])))
+        ax2.plot(x, fft_abs,label='bunch: '+str(i),marker='o',markersize =7) 
         ax2.set_xlim(x[1],0.5)
     ax2.legend()
     #ax2.set_ylabel('sigma_x^2 - sigma_y^2[mm^2]')
