@@ -9,13 +9,13 @@ measure_vol = np.loadtxt("vol.txt")
 ### matrix  invA_8pu_1_1-7MHz_1st.txt*
 inv_A_8 = [ np.loadtxt("./matrix/invA_8pu_"+str(i) +"_3-4MHz_2nd.txt") for i in range(2) ]
 
-mom_num = 6
-try_num = 10 
+mom_num = 10
+try_num = 1 
 initial_par = [1. for i in range(16)]
-error = [1e-3 for i in range(16)]
+error = [1e-4 for i in range(16)]
 fix_par = [False  for i in range(16)]
 fix_par[0] = True
-limit_par = [[0.9,1.1] for i in range(16)]
+limit_par = [[0.95,1.05] for i in range(16)]
 
     
 def pos(par):
@@ -31,12 +31,12 @@ def pos(par):
     sum_mom[3] = np.sum((mom_8_0[:,3]-mom_8_1[:,3])**2)
     sum_mom[4] = np.sum((mom_8_0[:,4] - 2 * mom_8_0[:,1] * mom_8_0[:,2] /mom_8_0[:,0])**2)
     sum_mom[5] = np.sum((mom_8_1[:,4] - 2 * mom_8_1[:,1] * mom_8_1[:,2] /mom_8_1[:,0])**2)
-    #sum_mom[6] = np.sum((mom_8_0[:,5] - 3 * mom_8_0[:,1] * mom_8_0[:,3] / mom_8_0[:,0] + 2 * mom_8_0[:,1]**3 / mom_8_0[:,0]**2) **2)
-    #sum_mom[7] = np.sum((mom_8_1[:,5] - 3 * mom_8_1[:,1] * mom_8_1[:,3] / mom_8_1[:,0] + 2 * mom_8_1[:,1]**3 / mom_8_1[:,0]**2) **2)
-    #sum_mom[8] = np.sum((mom_8_0[:,6] - 3 * mom_8_0[:,2] * mom_8_0[:,3] / mom_8_0[:,0] - 2 * mom_8_0[:,2]**3 / mom_8_0[:,0]**2) **2)
-    #sum_mom[9] = np.sum((mom_8_1[:,6] - 3 * mom_8_1[:,2] * mom_8_1[:,3] / mom_8_1[:,0] - 2 * mom_8_1[:,2]**3 / mom_8_1[:,0]**2) **2)
+    sum_mom[6] = np.sum((mom_8_0[:,5] - 3 * mom_8_0[:,1] * mom_8_0[:,3] / mom_8_0[:,0] + 2 * mom_8_0[:,1]**3 / mom_8_0[:,0]**2) **2)
+    sum_mom[7] = np.sum((mom_8_1[:,5] - 3 * mom_8_1[:,1] * mom_8_1[:,3] / mom_8_1[:,0] + 2 * mom_8_1[:,1]**3 / mom_8_1[:,0]**2) **2)
+    sum_mom[8] = np.sum((mom_8_0[:,6] - 3 * mom_8_0[:,2] * mom_8_0[:,3] / mom_8_0[:,0] - 2 * mom_8_0[:,2]**3 / mom_8_0[:,0]**2) **2)
+    sum_mom[9] = np.sum((mom_8_1[:,6] - 3 * mom_8_1[:,2] * mom_8_1[:,3] / mom_8_1[:,0] - 2 * mom_8_1[:,2]**3 / mom_8_1[:,0]**2) **2)
     #sum_mom[10] = np.sum((mom_8_0[:,7] - 3 * mom_8_0[:,3] **2/ mom_8_0[:,0] + 2 * mom_8_0[:,1]**4 / mom_8_0[:,0]**3+ 2 * mom_8_0[:,2]**4 / mom_8_0[:,0]**3) **2)
-    return sum_mom[0] * sum_mom[1] * sum_mom[2] * sum_mom[3] * sum_mom[4] * sum_mom[5]# * sum_mom[6] *sum_mom[7]*sum_mom[8]*sum_mom[9] #*sum_mom[10]
+    return sum_mom[0] * sum_mom[1] * sum_mom[2] * sum_mom[3] * sum_mom[4] * sum_mom[5] * sum_mom[6] *sum_mom[7]*sum_mom[8]*sum_mom[9] #*sum_mom[10]
 
 def minimum(flag):
     print('init '+ str(pos(initial_par)))

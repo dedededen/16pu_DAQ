@@ -49,11 +49,17 @@ def read_process_file(fName):
         #return
     mom = np.array(mom)
     if 'address13' in fName:
-        mom[:,10],mom[:,11] = mom[:,11],mom[:,10]
+        buf  = np.copy(mom[:,10])
+        mom[:,10] = mom[:,11]
+        mom[:,11] = buf
     elif 'address15' in fName:
         pass
+    elif 'address0' in fName:
+        pass
     else:
-        mom[:,10],mom[:,11] = mom[:,11],mom[:,10]
+        buf  = np.copy(mom[:,10])
+        mom[:,10] = mom[:,11]
+        mom[:,11] = buf
     return mom
     
 if __name__=='__main__':

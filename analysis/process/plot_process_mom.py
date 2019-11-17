@@ -91,7 +91,7 @@ def plot_process_mom(file_name,vol):
     #ax1_1.set_xlabel('turn')
     ax1_1.grid()
 
-    fft_num = 40
+    fft_num = 15
     ax2 = fig.add_subplot(2, 2, 3)
     for i in range(num_bun):
         if bunch_on[i] == 0:
