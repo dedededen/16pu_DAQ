@@ -7,7 +7,7 @@ def process_mom(file_name,vol):
     bunch_on = np.zeros(9)
     num = vol.shape[0] -10
     moment = [ [] for i in range(9)]
-    if "address15" in file_name[0]:
+    if "address15" in file_name:
         mon = 0
     else:
         mon = 1

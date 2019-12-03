@@ -9,32 +9,52 @@ from wave import plot_tmg
 from wave import plot_wave
 from wave import plot_bunch_moment
 from wave import plot_fft
-from wave import reflectance
 from wave import plot_all_mom
 from process import plot_process
 from process import plot_process_mom
-from process import process_ref
+from process import process_13_15
+from process import betatron_13_15
+from process import cal_process_mom
 from noise import noise_analysis
-
-mode = {0:'Beam data',1:'Adjustment of timing',2:'Noise',3:'Reflectance',4:'all'}
+from extract import extract_data
+from extract import plot_pos
+from extract import adiabatic_dump
+from extract import betatron_ext
+from reflectance import reflectance
+from reflectance import process_ref
+from BBA import BBA_cal
 
 class Application(gui.Design,object):
-    def __init__(self,mode=0):
+    def __init__(self):
         super(Application,self).__init__()
-        self.mode_num = mode
         self.select.configure(command=self._select)
 
     def _select(self):
+        self.mode_num = self.num_mode.get()
+        ### Home
+        if self.mode_num == 16:
+            self.reflesh()
+            return
+        ### BBA
+        elif self.mode_num == 10:
+            BBA_cal.extract_cal_vol()
+            return
+
         file_index = self.file_list.curselection()
         file_name = self.data_path+self.file_list.get(file_index[0]).replace('  ','')
+
         if not file_index: return
+        ### extract
+        elif self.mode_num == 5:
+            extract_data.extract_vol(file_name)
+        ### 
         elif os.path.isdir(file_name):
             self.reflesh(path=file_name)
         else : self.act_mode(file_name=file_name)
-
+        
     def act_mode(self,file_name):
-        print(self.mode_num)
-        ### beam time
+        self.mode_num = self.num_mode.get()
+        ### beam data
         if self.mode_num == 0:
             if 'wave_2' in file_name:
                 self.memo(file_name)
@@ -60,33 +80,46 @@ class Application(gui.Design,object):
                 self.memo(file_name)
                 noise_analysis.process_noise(file_name)
         ### reflectance
-        elif self.mode_num == 3:
+        elif self.mode_num == 9:
             if 'wave_2' in file_name:
                 self.memo(file_name)
                 reflectance.plot_relation_reflectance(file_name)
             elif 'process_2' in file_name:
                 self.memo(file_name)
                 process_ref.plot_process_ref(file_name)
-        ### all
+        ### #13 and #15
+        elif self.mode_num == 3:
+            if 'wave_2' in file_name:
+                self.memo(file_name)
+                #noise_analysis.wave_noise(file_name)
+            elif 'process_2' in file_name:
+                self.memo(file_name)
+                process_13_15.plot_13_15(file_name)
+        ### betatron osc. #13 and #15
         elif self.mode_num == 4:
-            if 'wave_2' in file_name[0]:
-                self.memo(file_name[0])
-                plot_all_mom.plot_mom(file_name)
-            elif 'process_2' in file_name[0]:
-                self.memo(file_name[0])
+            if 'wave_2' in file_name:
+                self.memo(file_name)
+                #noise_analysis.wave_noise(file_name)
+            elif 'process_2' in file_name:
+                self.memo(file_name)
+                betatron_13_15.betatron(file_name)
+            elif '.txt' in file_name:
+                betatron_ext.plot_twiss(file_name)
+        ### plot extract data
+        elif self.mode_num == 6:
+            if 'vol' in file_name:
+                plot_pos.plot_row(file_name)
+
+        ### plot extract data
+        elif self.mode_num == 7:
+            if 'vol' in file_name:
+                adiabatic_dump.plot_dump(file_name)
+
                 
                 
 
 if __name__=="__main__":
-    args = sys.argv
-    if len(sys.argv) == 1:
-        print('argv is None.')
-        print('[USAGE]: python quick_analysis.py #mode number')
-        for i in range(len(mode)):
-            print('\t mode ' +str(i) +' : ' +mode[i])
-    else:
-        print('Begin in mode ' + str(args[1]) +'\t'+ mode[int(args[1])])
-        app = Application(mode=int(args[1]))
-        app.mainloop()
+    app = Application()
+    app.mainloop()
     
     

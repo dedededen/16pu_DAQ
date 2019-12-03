@@ -27,19 +27,30 @@ def wave_noise(file_name):
     plt.grid()
     plt.show()
 
-def process_noise(file_name):
+def process_noise(file_name,saveon=0):
     vol = decode_process.read_process_file(file_name)
     fig = plt.figure()#figsize=(15,9))
     plt.title(os.path.split(file_name)[1], fontsize=20)
     plt.subplots_adjust(top=0.9)
-
+    noise = np.zeros(16)
     for i in range(16):
-        plt.hist(vol[:,i],label=str(i),histtype='step')
+        plt.hist(vol[:,i],label=str(i),histtype='step',bins=100)
+        noise[i] = np.mean(vol[0:,i])
+        print('ch: ' + str(i) +'\tmean: ' + str(noise[i]) + '\tstd: ' + str(np.std(vol[0:,i])))
     plt.legend()
     plt.xscale('log')
-    plot_process(vol,file_name)
+    if saveon ==1:
+        if 'address13' in file_name:
+            ofile = '/jkdata/jkpublic/accbmon/mrbmon/16pu_data/16pu_DAQ/analysis/noise/par/noise_address13'
+        else:
+            ofile = '/jkdata/jkpublic/accbmon/mrbmon/16pu_data/16pu_DAQ/analysis/noise/par/noise_address15'
+        plt.savefig(ofile+'.png')
+        np.savetxt(ofile+'.txt',noise)
+        plt.show()
+        return
+    plot_process(vol,file_name,saveon)
 
-def plot_process(mom,file_name):
+def plot_process(mom,file_name,saveon):
     num = len(mom[:,0])
     
     x = range(num)
@@ -47,7 +58,6 @@ def plot_process(mom,file_name):
 
     for j in range(16):
         plt.plot(x,mom[:,j],linewidth=0.5,marker='v',markersize=1,label=str(j))
-        print('ch: ' + str(j) +'\tmean: ' + str(np.mean(mom[0:,j])) + '\tstd: ' + str(np.std(mom[0:,j])))
         #plt.ylim(0,16*2**14)
 
     plt.yscale('log')
@@ -59,3 +69,8 @@ def plot_process(mom,file_name):
     #plt.legend(loc="upper center", ncol=4)
 
     plt.show()
+
+if __name__=='__main__':
+    import sys
+    args = sys.argv
+    process_noise(args[1])

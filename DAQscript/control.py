@@ -1,3 +1,4 @@
+
 import sys
 ver_python = sys.version_info[0]
     
@@ -77,6 +78,7 @@ def set_gain(sock,id_num,gain_value = [1.0 for i in range(16)]):
         sock.recvfrom(2048)#'a'
     id_num[0] += 16
     return 
+
 def set_mode(sock,id_num,mode=3): ### mode={0:"process",2:"wave",3:"ready"]
     sndHeader = [ RBCP_VER , RBCP_CMD_WR, id_num[0], 1,
                  0,0,0,0,
@@ -121,7 +123,7 @@ def set_test_triger(sock,id_num):
 def reset_sitcp(sock,id_num):
     sndHeader = [ RBCP_VER , RBCP_CMD_WR, id_num[0],1,
                  0xFF,0xFF,0xFF,0x10,
-                 0x80]
+                 0x00]#80]
     sock.send(bytearray(sndHeader))    
     sock.recvfrom(2048)#'a'
     sndHeader[2] += 1
@@ -142,11 +144,13 @@ BUF_SIZE = 40
 header_ex = [ b"TRANSVERS",b'wave']
 footer_ex = [ b"DATA processed with the 16-pu-monitor circuit",b'data']
 if ver_python == 2:
-   header_ex = [ "TRANSVERSE MOMENTs measured with sixteen-pu-monitor at address 15",'wave']
-   footer_ex = [ "DATA processed with the 16-pu-monitor circuit",'data']
+    #header_ex = [ "TRANSVERSE MOMENTs measured with sixteen-pu-monitor at address 15",'wave']
+    header_ex = [ "TRANSVERS",'wave']
+    #footer_ex = [ "DATA processed with the 16-pu-monitor circuit",'data']
+    footer_ex = [ "DATA",'data']
  
 def receive_data(sock, header=header_ex[0], footer=footer_ex[0],datapath='./data/',
-                 filename=None,flag=0):
+                 filename=None,flag=0,address=0):
     recvData = sock.recv(READING_BUF_SIZE)
     while True:
         if len(recvData) > BUF_SIZE:
@@ -154,7 +158,7 @@ def receive_data(sock, header=header_ex[0], footer=footer_ex[0],datapath='./data
                 dt_time = '{0:%Y_%m_%d_%H_%M_%S}'.format(datetime.datetime.now())
                 #print("data start: "+ dt_time)
                 if filename == None:
-                    filename = datapath +'process_data/process_'+ dt_time + '.dat'
+                    filename = datapath +'process_data/process_'+ dt_time + '_address'+str(address)+'.dat'
                     print(filename)
                 fd = open(filename,'ab')
                 if flag ==0 : fd.write(dt_time.encode())
@@ -197,6 +201,7 @@ def get_wave(sock,sockTCP,id_num,process_fname):
         #sock.recvfrom(2048)#'a'
         if ch ==0:set_mode(sock,id_num,3)
         receive_data(sockTCP,header=header_ex[1], footer=footer_ex[1],flag=ch,filename=fname)
+
         #time.sleep(0.1)
         #time.sleep(0.08)
         sndHeader[3] += 1

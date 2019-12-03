@@ -14,11 +14,12 @@ class Application(gui_design.Design,object):
                  address_num=13,
                  rbcpPort=4660,
                  tcpPort=24,
-                 gain_file='./DAQscript/gain/gain_test.txt',
-                 ofile ='/jkdata/jkpublic/accbmon/mrbmon/16pu_data/16pu_address'):
-
-        self.ofile = ofile + str(address_num) + '/' + '{0:%Y%m%d/}'.format(datetime.datetime.now())
-        
+                 gain_file='./DAQscript/gain/gain_test.txt', ## all 1.0
+                 ofile ='/jkdata/jkpublic/accbmon/mrbmon/16pu_data/'):
+    
+        #self.ofile = ofile + str(address_num) + '/' + '{0:%Y%m%d/}'.format(datetime.datetime.now())
+        self.ofile = ofile  + '{0:%Y%m%d/}'.format(datetime.datetime.now())
+        self.address = address_num
         if not os.path.exists(self.ofile):
             os.mkdir(self.ofile)
             os.mkdir(self.ofile+'wave_data')
@@ -72,11 +73,11 @@ class Application(gui_design.Design,object):
             print("Beginning : Get_Data")
             if num_mode == 0:
                 control.set_mode(self.sock,self.RBCP_ID,0)        
-                fname = control.receive_data(self.sockTCP,datapath=self.ofile)
+                fname = control.receive_data(self.sockTCP,datapath=self.ofile,address=self.address)
                 flist.append(fname)
             elif num_mode == 2:
                 control.set_mode(self.sock,self.RBCP_ID,2)        
-                fname = control.receive_data(self.sockTCP,datapath=self.ofile)
+                fname = control.receive_data(self.sockTCP,datapath=self.ofile,address=self.address)
                 control.get_wave(self.sock,self.sockTCP,self.RBCP_ID,process_fname=fname)
                 flist.append(fname)
                 time.sleep(1.5)
@@ -101,13 +102,13 @@ if __name__=="__main__":
     print("HOST NAME: " + hostname)
     if hostname == 'sioc-mon-d1hexadeca01.mr.jkcont':
         print("Begin DAQ script for # 13")
-        app = Application(address_num=13)
+        app = Application(ipAddr="10.72.108.43",address_num=13)
         app.mainloop()
         app.sock.close()
 
     elif hostname == 'sioc-mon-d1hexadeca02.mr.jkcont':
         print("Begin DAQ script for # 15")
-        app = Application(address_num=15)
+        app = Application(ipAddr="10.72.108.43",address_num=15)
         app.mainloop()
         app.sock.close()
 

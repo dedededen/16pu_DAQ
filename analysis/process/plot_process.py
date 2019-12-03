@@ -4,8 +4,13 @@ import matplotlib.pyplot as plt
 import os
 
 from process import decode_process
-noise = [0.25 for i in range(16)]
+
 def plot_process(file_name):
+    if 'address13' in file_name:
+        ofile = '/jkdata/jkpublic/accbmon/mrbmon/16pu_data/16pu_DAQ/analysis/noise/par/noise_address13.txt'
+    else:
+        ofile = '/jkdata/jkpublic/accbmon/mrbmon/16pu_data/16pu_DAQ/analysis/noise/par/noise_address15.txt'
+    noise = np.loadtxt(ofile)
     mom = decode_process.read_process_file(file_name)
     fig = plt.figure(figsize=(15,9))
     for j in range(16):

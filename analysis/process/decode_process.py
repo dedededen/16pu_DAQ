@@ -2,14 +2,15 @@
 ### python2 & python3 OK
 import  numpy as np
 import struct
+from reflectance import extract_ref
 
 DataLength = 65528
 timestamplength = 19
 headerLength = 6
 
 Header = b"TRANSVERSE MOMENTs measured with sixteen-pu-monitor at address 15"
-Footer = b"DATA processed with the 16-pu-monitor circuit"
-constant = 1/64e6
+Footer = b"DATA"# processed with the 16-pu-monitor circuit"
+constant = 1/64e6 *52/64
 
 def read_process_file(fName):
     mom = []
@@ -44,7 +45,8 @@ def read_process_file(fName):
                 data_per_bunch[j] = frac * 2**exp *(-1) * constant
         mom.append(data_per_bunch)
 
-    if Footer != struct.unpack('45s',fid.read(45))[0]:
+    #if Footer != struct.unpack('45s',fid.read(45))[0]:
+    if Footer != struct.unpack('4s',fid.read(4))[0]:
         print('Error: Footer')        
         #return
     mom = np.array(mom)
@@ -57,9 +59,8 @@ def read_process_file(fName):
     elif 'address0' in fName:
         pass
     else:
-        buf  = np.copy(mom[:,10])
-        mom[:,10] = mom[:,11]
-        mom[:,11] = buf
+        pass
+    #mom = extract_ref.remove_ref(mom,fName)
     return mom
     
 if __name__=='__main__':
