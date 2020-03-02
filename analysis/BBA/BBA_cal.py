@@ -1,251 +1,131 @@
 
+
 import numpy as np
 import os
-from process import decode_process
 import datetime
-from cal_mom import cal_mom
 import matplotlib.pyplot as plt
 from myROOT import fit_po1
 
 # extract setting
+from BBA import extract_BBA
 import time
-def extract_cal_vol():
-    datapath = '/jkdata/jkpublic/accbmon/mrbmon/16pu_data/20191128/BBA_data/process_2019_11_28_'
-    datamid =[# data pos I[A]
-        ### pos 0  (0,0)
-        ['04_33_56',5],
-        ['04_35_21',2.5],
-        ['04_29_24',0], 
-        ['04_36_28',-2.5],
-        ['04_37_47',-5],
 
-        ### pos 1  (0,4)
-        ['04_43_27',5], 
-        ['04_42_05',2.5],
-        ['04_41_08',0],
-        ['04_40_38',-2.5],
-        ['04_40_06',-5],
+def plot_hist(res,bunch=1,horv=0):
+    ans = np.ones((15,2,2))
+    if horv==0:
+        index = [15,16,17,18,19,0,1,2,3,4,10,11,12,13,14]
+        label = ['x[mm]','dx/dI[mm/A]','  horizontal','_h']
+        turnend = 286
+    elif horv==1:
+        index = [5,6,7,8,9,0,1,2,3,4,20,21,22,23,24]
+        label = ['y[mm]','dy/dI[mm/A]','  vertical','_v']
+        turnend = 465
 
-        ### pos 2 (-4,0) 
-        ['04_58_39',5], 
-        ['04_59_46',2.5],
-        ['05_00_48',0],
-        ['05_01_21',-2.5],
-        ['05_02_10',-5],
+    for j in range(15):
+        for mon in range(2):
+            min = np.min(res[index[j]][mon]) - 0.05
+            max = np.max(res[index[j]][mon]) + 0.05
+            fig = plt.figure(figsize=[20,10])
+            fig.suptitle('Mon.:  '+str(mon)+', shot: '+str(index[j])+label[2])
+            for i in range(bunch):
+                plt.subplot(bunch,2,1+2*i)
+                turn = range(len(res[index[j]][mon][i::bunch]))
+                plt.plot(turn,res[index[j]][mon][i::bunch])
+                plt.axhline(np.mean(res[index[j]][mon][i:turnend:bunch]), ls = "--", color = "navy")
+                plt.xlabel('turn')
+                plt.ylabel(label[0])
+                plt.ylim(min,max)
 
-        ### pos 3  (4,0)
-        ['05_06_50',5], 
-        ['05_07_30',2.5],
-        ['05_04_27',0],
-        ['05_03_59',-2.5],
-        ['05_03_27',-5],
-
-        ### pos 4  (0,4)
-        ['05_08_37',5], 
-        ['05_09_09',2.5],
-        ['05_10_06',0],
-        ['05_10_56',-2.5],
-        ['05_11_38',-5]
-    ]
-    dataend = ['_address13.dat','_address15.dat']
-    
-    resx  = []
-    resy  = []
-    shot_num = 25
-    for i in range(shot_num):
-        file13  = datapath + datamid[i][0] + dataend[0]
-        file15  = datapath + datamid[i][0] + dataend[1]
-        print(file13,file15)
-        vol13 = decode_process.read_process_file(file13)
-        vol15 = decode_process.read_process_file(file15)
+                if i == 0:
+                    ans[j][mon][0] = np.mean(res[index[j]][mon][i:turnend:bunch])
+                    ans[j][mon][1] = np.std(res[index[j]][mon][i:turnend:bunch])/np.sqrt(turnend)
+                text = str(round(np.mean(res[index[j]][mon][i:turnend:bunch]),3)) +'+/-' + str(round(np.std(res[index[j]][mon][i:turnend:bunch]),3)) + '[mm]'
+                # print(text)
+                # text = str(round(np.mean(res[index[j]][mon][i::bunch]),3)) +'+/-' + str(round(np.std(res[index[j]][mon][i::bunch]),3)) + '[mm]'
+                # print(text)
+                plt.text(300,min+0.05,text)
         
-        
-        turn_start = 1
-        turn_end   = 501
-        nbunch     = 1
-        x = [[],[]]#13,15
-        y = [[],[]]#13,15
-        for j in range(turn_start,turn_end):
-            mom13 = cal_mom.moment(vol13[j*9+nbunch-1],num_mon=1)
-            mom15 = cal_mom.moment(vol15[j*9+nbunch-1],num_mon=0)
-            
-            x[0].append(mom13[1])
-            x[1].append(mom15[1])
-            y[0].append(mom13[2])
-            y[1].append(mom15[2])
-            
-        resx.append(x)
-        resy.append(y)
-    ### shot 1315bunch turn
-    resx = np.array(resx)
-    resy = np.array(resy)
-    
+                plt.subplot(bunch,2,2+2*i)            
+                numbin = int((max-min)/0.01) + 1
+                plt.hist(res[index[j]][mon][i:turnend:bunch],histtype="step", orientation="horizontal",
+                    range = [min,max],bins=numbin)
+                plt.axhline(np.mean(res[index[j]][mon][i:turnend:bunch]), ls = "--", color = "navy")
+
+            plt.savefig('/jkdata/jkpublic/accbmon/mrbmon/16pu_data/16pu_DAQ/analysis/BBA/pic/MON'+str(mon)+'_shot'+str(index[j])+label[3]+'.png')
+            plt.close()
+    return ans
+def plot(res, mon=13,horv=0):
     I = np.array([ 5 -2.5*i for i  in range(5)])
-    xK13 = np.zeros([2,3])
-    yK13 = np.zeros([2,3])
-    xK15 = np.zeros([2,3])
-    yK15 = np.zeros([2,3])
     
+    if mon == 13:
+        num_mon = 0
+    elif mon == 15:
+        num_mon = 1
 
-    ## pos 0
-    x13 = [ np.mean(resx[i][0]) for i in range(5)]
-    x15 = [ np.mean(resx[i][1]) for i in range(5)]
-    y13 = [ np.mean(resy[i][0]) for i in range(5)]
-    y15 = [ np.mean(resy[i][1]) for i in range(5)]
-    ex13 = [ np.std(resx[i][0]) for i in range(5)]
-    ex15 = [ np.std(resx[i][1]) for i in range(5)]
-    ey13 = [ np.std(resy[i][0]) for i in range(5)]
-    ey15 = [ np.std(resy[i][1]) for i in range(5)]
-    plt.figure()
+    if horv==0:
+        index = [15,16,17,18,19,0,1,2,3,4,10,11,12,13,14]
+        label = ['x[mm]','dx/dI[mm/A]','  horizontal  :',
+                 '/jkdata/jkpublic/accbmon/mrbmon/16pu_data/16pu_DAQ/analysis/BBA/x0_'+str(mon)+'.txt',
+                 'blue'
+                 ]
+    elif horv==1:
+        index = [5,6,7,8,9,0,1,2,3,4,20,21,22,23,24]
+        label = ['y[mm]','dy/dI[mm/A]','  vertical  :',
+                 '/jkdata/jkpublic/accbmon/mrbmon/16pu_data/16pu_DAQ/analysis/BBA/y0_'+str(mon)+'.txt',
+                 'red'
+                 ]
 
-    plt.subplot(2,2,1)
-    plt.errorbar(I,x13,yerr=ex13,fmt='v')
-    xK13[1][0], b = np.polyfit(I, x13, 1)
-    plt.plot(I,I*xK13[1][0]+b)
-    xK13[0][0] = x13[2]
-    plt.xlabel('I[A]')
-    plt.ylabel('x[mm]')
 
-    plt.subplot(2,2,2)
-    plt.errorbar(I,x15,yerr=ex15,fmt='v')
-    xK15[1][0], b = np.polyfit(I, x15, 1)
-    plt.plot(I,I*xK15[1][0]+b)
-    xK15[0][0] = x15[2]
-    plt.xlabel('I[A]')
-    plt.ylabel('x[mm]')
+    dxdi = [np.zeros(3) for i in range(2)]
+    x0 = [np.zeros(3) for i in range(2)]
+    fig = plt.figure(figsize=(20,6))
+    plt.rcParams["font.size"] = 16    
+    #plt.suptitle('#'+str(mon) +label[2])
+    for i in range(3):
+        y = [res[5*i+j][num_mon][0] for j in range(5)]
+        ey = [res[5*i+j][num_mon][1] for j in range(5)]
 
-    plt.subplot(2,2,3)
-    plt.errorbar(I,y13,yerr=ey13,fmt='v')
-    yK13[1][0], b = np.polyfit(I, y13, 1)
-    plt.plot(I,I*yK13[1][0]+b)
-    yK13[0][0] = y13[2]
-    plt.xlabel('I[A]')
-    plt.ylabel('y[mm]')
+        plt.subplot(1,3,1+i)
+        plt.errorbar(I,y,yerr=ey,fmt='v',capsize=5, fmt='.', markersize=1, ecolor=label[4], markeredgecolor = label[4], ,label=label[2])
+        plt.grid()
+        a, b = fit_po1.po1(I,y,ey=ey)
+        dxdi[0][i] = a[0]
+        dxdi[1][i] = b[0]
+        x0[0][i] = np.mean(y)
+        x0[1][i] = ey[2]
+        plt.plot(I,I*dxdi[0][i]+a[1])
+        plt.xlabel('I[A]')
+        if i ==0: plt.ylabel(label[0])
+        
+    fig = plt.figure(figsize=(20,6))
+    plt.rcParams["font.size"] = 16    
 
-    plt.subplot(2,2,4)
-    plt.errorbar(I,y15,yerr=ey15,fmt='v')
-    yK15[1][0], b = np.polyfit(I, y15, 1)
-    plt.plot(I,I*xK15[1][0]+b)
-    yK15[0][0] = y15[2]
-    plt.xlabel('I[A]')
-    plt.ylabel('y[mm]')
-
+    plt.errorbar(x0[0],dxdi[0][::],xerr=x0[1],yerr=dxdi[1][::],fmt='v')
+    #a, b = fit_po1.po1(x0[0],dxdi[0],ex=x0[1],ey=dxdi[1])
+    a, b = fit_po1.po1([x0[0][0],x0[0][2]],[dxdi[0][0],dxdi[0][2]],ex=[x0[1][0],x0[1][2]],ey=[dxdi[1][0],dxdi[1][2]])
+    plt.plot(x0[0],a[0]*x0[0]+a[1])
+    ans = [-1 *a[1]/a[0], np.abs(a[1]/a[0]) * np.sqrt(b[0]**2/a[0]**2 +b[1]**2/a[1]**2 ) ]
+    text = '#'+str(mon) +label[2]+'\n'+str(round(ans[0],3)) +'  +/-  ' + str(round(ans[1],3)) 
+    print('#'+str(mon) +label[2]+ str(ans[0]) +'  +/-  ' + str(ans[1]) )
+    plt.text(0,0,text)
+    plt.xlabel(label[0])
+    plt.ylabel(label[1])
+    np.savetxt(label[3],x0)
+    return ans,x0,dxdi
     
-    # ## pos2,3
-    x13 = [ np.mean(resx[10+i][0]) for i in range(5)]
-    x15 = [ np.mean(resx[10+i][1]) for i in range(5)]
-    y13 = [ np.mean(resx[15+i][0]) for i in range(5)]
-    y15 = [ np.mean(resx[15+i][1]) for i in range(5)]
-    ex13 = [ np.std(resx[10+i][0]) for i in range(5)]
-    ex15 = [ np.std(resx[10+i][1]) for i in range(5)]
-    ey13 = [ np.std(resy[15+i][0]) for i in range(5)]
-    ey15 = [ np.std(resy[15+i][1]) for i in range(5)]
-    plt.figure()
-    plt.subplot(2,2,1)
-    plt.errorbar(I,x13,yerr=ex13,fmt='v')
-    xK13[1][1], b = np.polyfit(I, x13, 1)
-    plt.plot(I,I*xK13[1][1]+b)
-    xK13[0][1] = x13[2]
-    plt.xlabel('I[A]')
-    plt.ylabel('x[mm]')
-
-    plt.subplot(2,2,2)
-    plt.errorbar(I,x15,yerr=ex15,fmt='v')
-    xK15[1][1], b = np.polyfit(I, x15, 1)
-    plt.plot(I,I*xK15[1][1]+b)
-    xK15[0][1] = x15[2]
-    plt.xlabel('I[A]')
-    plt.ylabel('x[mm]')
-
-    plt.subplot(2,2,3)
-    plt.errorbar(I,y13,yerr=ey13,fmt='v')
-    xK13[1][2], b = np.polyfit(I, y13, 1)
-    plt.plot(I,I*xK13[1][2]+b)
-    xK13[0][2] = y13[2]
-    plt.xlabel('I[A]')
-    plt.ylabel('x[mm]')
-
-    plt.subplot(2,2,4)
-    plt.errorbar(I,y15,yerr=ey15,fmt='v')
-    xK15[1][2], b = np.polyfit(I, y15, 1)
-    plt.plot(I,I*xK15[1][2]+b)
-    xK15[0][2] = y13[2]
-    plt.xlabel('I[A]')
-    plt.ylabel('x[mm]')
-
-    # ## pos1,4
-    x13 = [ np.mean(resy[5+i][0]) for i in range(5)]
-    x15 = [ np.mean(resy[5+i][1]) for i in range(5)]
-    y13 = [ np.mean(resy[20+i][0]) for i in range(5)]
-    y15 = [ np.mean(resy[20+i][1]) for i in range(5)]
-    ex13 = [ np.std(resx[5+i][0]) for i in range(5)]
-    ex15 = [ np.std(resx[5+i][1]) for i in range(5)]
-    ey13 = [ np.std(resy[20+i][0]) for i in range(5)]
-    ey15 = [ np.std(resy[20+i][1]) for i in range(5)]
-    fig = plt.figure()
-
-    plt.subplot(2,2,1)
-    plt.errorbar(I,x13,yerr=ex13,fmt='v')
-    yK13[1][1], b = np.polyfit(I, x13, 1)
-    plt.plot(I,I*yK13[1][1]+b)
-    yK13[0][1] = x13[2]
-    plt.xlabel('I[A]')
-    plt.ylabel('y[mm]')
-
-    plt.subplot(2,2,2)
-    plt.errorbar(I,x15,yerr=ex15,fmt='v')
-    yK15[1][1], b = np.polyfit(I, x15, 1)
-    plt.plot(I,I*yK15[1][1]+b)
-    yK15[0][1] = x15[2]
-    plt.xlabel('I[A]')
-    plt.ylabel('y[mm]')
-
-    plt.subplot(2,2,3)
-    plt.errorbar(I,y13,yerr=ey13,fmt='v')
-    yK13[1][2], b = np.polyfit(I, y13, 1)
-    plt.plot(I,I*yK13[1][2]+b)
-    yK13[0][2] = y13[2]
-    plt.xlabel('I[A]')
-    plt.ylabel('y[mm]')
-
-    plt.subplot(2,2,4)
-    plt.errorbar(I,y15,yerr=ey15,fmt='v')
-    yK15[1][2], b = np.polyfit(I, y15, 1)
-    plt.plot(I,I*yK15[1][2]+b)
-    yK15[0][2] = y15[2]
-    plt.xlabel('I[A]')
-    plt.ylabel('y[mm]')
-
-    ##res
-    plt.figure()
-    plt.subplot(2,2,1)
-    #plt.errorbar(I,x13,yerr=ex13,fmt='v')
-    plt.scatter(xK13[0],xK13[1])
-    a, b = fit_po1.po1(xK13[0],xK13[1])
-    print(-1 *a[1]/a[0])
-    a, b = np.polyfit(xK13[0],xK13[1], 1)
-    print(-1 *b/a)
-    plt.xlabel('x[mm]')
-    #plt.ylabel('y[mm]')
-
-    plt.subplot(2,2,2)
-    #plt.errorbar(I,x13,yerr=ex13,fmt='v')
-    plt.scatter(xK15[0],xK15[1])
-    plt.xlabel('x[mm]')
-    #plt.ylabel('y[mm]')
-
-    plt.subplot(2,2,3)
-    #plt.errorbar(I,x13,yerr=ex13,fmt='v')
-    plt.scatter(yK13[0],yK13[1])
-    plt.xlabel('y[mm]')
-    #plt.ylabel('y[mm]')
-
-    plt.subplot(2,2,4)
-    #plt.errorbar(I,x13,yerr=ex13,fmt='v')
-    plt.scatter(yK15[0],yK15[1])
-    plt.xlabel('y[mm]')
-    #plt.ylabel('y[mm]')
-    
+def extract_cal_vol():
+    num = 550
+    resx ,resy = extract_BBA.extract_data(turn=[1,1+num],bunch=[[1,2,3,4],[1,2,3,4]])
+    resx = plot_hist(resx,bunch=4,horv=0)
+    resy = plot_hist(resy,bunch=4,horv=1)
+    res13h = plot(resx,mon=13,horv=0)
+    res15h = plot(resx,mon=15,horv=0)
+    res13v = plot(resy,mon=13,horv=1)
+    res15v = plot(resy,mon=15,horv=1)
+    ans = np.array([[res13h[0][0],res13v[0][0],res13h[0][1],res13v[0][1]]
+          ,[res15h[0][0],res15v[0][0],res15h[0][1],res15v[0][1]]])
+    np.savetxt('/jkdata/jkpublic/accbmon/mrbmon/16pu_data/16pu_DAQ/analysis/cal_mom/alighment.txt',ans)
     plt.show()
+
     return 
 

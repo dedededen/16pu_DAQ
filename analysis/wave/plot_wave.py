@@ -17,6 +17,7 @@ def plot_wave(file_name):
     num = len(vol[0])
     num_range = teibai * 9
     #x = range(num)
+    plt.rcParams["font.size"] = 24
     x = range(num_range)        
     fig = plt.figure(figsize=(15,9))
     for ch in range(16):

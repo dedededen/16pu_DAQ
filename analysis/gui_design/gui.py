@@ -59,19 +59,19 @@ class Design(Tkinter.Frame,object):
                             variable=self.num_mode).place(relx=0.6, rely=0.1)
         Tkinter.Radiobutton(self.modeFrame, text="BBA", value=10,
                             variable=self.num_mode).place(relx=0.6, rely=0.2)
-        Tkinter.Radiobutton(self.modeFrame, text="None8", value=11,
+        Tkinter.Radiobutton(self.modeFrame, text="zero order", value=11,
                             variable=self.num_mode).place(relx=0.6, rely=0.3)
-        Tkinter.Radiobutton(self.modeFrame, text="None9", value=12,
+        Tkinter.Radiobutton(self.modeFrame, text="Quad.osc. 12/12", value=12,
                             variable=self.num_mode).place(relx=0.6, rely=0.4)
-        Tkinter.Radiobutton(self.modeFrame, text="None10", value=13,
+        Tkinter.Radiobutton(self.modeFrame, text="kiwamu", value=13,
                             variable=self.num_mode).place(relx=0.6, rely=0.5)
-        Tkinter.Radiobutton(self.modeFrame, text="None11", value=14,
+        Tkinter.Radiobutton(self.modeFrame, text="Mabiki", value=14,
                             variable=self.num_mode).place(relx=0.6, rely=0.6)
-        Tkinter.Radiobutton(self.modeFrame, text="None12", value=15,
+        Tkinter.Radiobutton(self.modeFrame, text="Quad. osc. 12/04", value=15,
                             variable=self.num_mode).place(relx=0.6, rely=0.7)
-        Tkinter.Radiobutton(self.modeFrame, text="None13", value=8,
+        Tkinter.Radiobutton(self.modeFrame, text="Quad. vs x^2-y^2", value=8,
                             variable=self.num_mode).place(relx=0.6, rely=0.8)
-        Tkinter.Radiobutton(self.modeFrame, text="Help", value=17,
+        Tkinter.Radiobutton(self.modeFrame, text="Cmap(wave)", value=17,
                             variable=self.num_mode).place(relx=0.6, rely=0.9)
         
 

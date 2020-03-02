@@ -15,6 +15,7 @@ from process import plot_process_mom
 from process import process_13_15
 from process import betatron_13_15
 from process import cal_process_mom
+from process import quad_xy
 from noise import noise_analysis
 from extract import extract_data
 from extract import plot_pos
@@ -22,7 +23,13 @@ from extract import adiabatic_dump
 from extract import betatron_ext
 from reflectance import reflectance
 from reflectance import process_ref
-from BBA import BBA_cal
+##from BBA import BBA_cal
+from osc_quad import quad_osc
+from osc_quad import quad_osc_1212
+from zero_moment import zero
+from mabiki import mabiki_em
+from kiwamu import kiwamu_em
+from cmap import plot_cmap
 
 class Application(gui.Design,object):
     def __init__(self):
@@ -39,7 +46,17 @@ class Application(gui.Design,object):
         elif self.mode_num == 10:
             BBA_cal.extract_cal_vol()
             return
-
+        ### mabiki
+        elif self.mode_num == 14:
+            mabiki_em.emittance()
+            return
+        ### mabiki
+        elif self.mode_num == 15:
+            quad_osc.emittance()
+            return
+        elif self.mode_num == 12:
+            quad_osc_1212.emittance()
+            return
         file_index = self.file_list.curselection()
         file_name = self.data_path+self.file_list.get(file_index[0]).replace('  ','')
 
@@ -53,6 +70,7 @@ class Application(gui.Design,object):
         else : self.act_mode(file_name=file_name)
         
     def act_mode(self,file_name):
+
         self.mode_num = self.num_mode.get()
         ### beam data
         if self.mode_num == 0:
@@ -114,8 +132,24 @@ class Application(gui.Design,object):
         elif self.mode_num == 7:
             if 'vol' in file_name:
                 adiabatic_dump.plot_dump(file_name)
+        ### quad
+        elif self.mode_num == 8:
+            if 'process' in file_name:
+                quad_xy.quad(file_name)
+                        ### quad
 
-                
+        elif self.mode_num == 11:
+            if 'process' in file_name:
+                zero.power(file_name)
+        elif self.mode_num == 17:
+            if 'wave' in file_name:
+                plot_cmap.plot(file_name)
+
+        elif self.mode_num == 13:
+            if 'wave' in file_name:
+                kiwamu_em.emittance(file_name)
+                return
+
                 
 
 if __name__=="__main__":

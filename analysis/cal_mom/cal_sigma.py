@@ -2,7 +2,7 @@
 import numpy as np
 beta = np.array([[39.7,-5.9],[14.6,-30.6]]) #13,15
 beta = np.array([[39.7,-6.4],[14.6,-30.6]]) #13,15
-beta = np.array([[1,-1],[1./2.73,-1./0.216]]) #13,15
+beta = np.array([[1,-1],[1./2.669,-1./0.227]]) #13,15
 inv_beta = np.linalg.inv(beta)
 num_bun = 9
 
